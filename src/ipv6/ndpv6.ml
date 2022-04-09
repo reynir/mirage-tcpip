@@ -1147,7 +1147,7 @@ let local ~handle_ra ~now ~random mac =
   let address_list, actions =
     AddressList.add ctx.address_list ~now ~retrans_timer:ctx.retrans_timer ~lft:None ip
   in
-  let ctx, actions = {ctx with address_list}, SendRS :: actions in
+  let ctx, actions = {ctx with address_list}, actions @ [SendRS] in
   process_actions ~now ctx actions
 
 let add_ip ~now ctx ip =
