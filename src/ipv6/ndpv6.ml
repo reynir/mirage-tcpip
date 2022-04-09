@@ -357,7 +357,10 @@ module AddressList = struct
     | false ->
       let al = (ip, TENTATIVE (lft, 0, Int64.add now retrans_timer)) :: al in
       let dst = Ipaddr.Prefix.network_address solicited_node_prefix ip in
-      al, [SendNS (`Unspecified, dst, ip)]
+      if Ipaddr.Prefix.mem ip Ipaddr.Prefix.link then
+        al, [SendNS (`Unspecified, dst, ip)]
+      else
+        al, [SendNS (`Specified, dst, ip)]
     | true ->
       Log.warn (fun f -> f "ndpv6: attempted to add ip %a already in address list"
                    Ipaddr.pp ip);
