@@ -205,9 +205,8 @@ module Allocate = struct
     in
     hdr ~src ~dst ~hlim:255 ~proto:`ICMP ~size fillf
 
-  let rs ~mac select_source =
+  let rs ~mac src =
     let dst = Ipaddr.link_routers in
-    let src = select_source ~dst in
     let cmp = Ipaddr.compare in
     let include_slla = (cmp src Ipaddr.unspecified) != 0 in
     let slla_len = if include_slla then Ipv6_wire.sizeof_llopt else 0 in
@@ -1086,7 +1085,7 @@ let rec process_actions ~now ctx actions =
       send' ~now ctx dst size fillf
     | SendRS ->
       Log.debug (fun f -> f "ND6: Sending RS");
-      let size, fillf = Allocate.rs ~mac:ctx.mac (AddressList.select_source ctx.address_list) in
+      let size, fillf = Allocate.rs ~mac:ctx.mac (link_local_addr ctx.mac) in
       let dst = Ipaddr.link_routers in
       send' ~now ctx dst size fillf
     | SendQueued (ip, dmac) ->
