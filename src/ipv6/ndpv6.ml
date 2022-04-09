@@ -1084,7 +1084,7 @@ let rec process_actions ~now ctx actions =
       send' ~now ctx dst size fillf
     | SendRS ->
       Log.debug (fun f -> f "ND6: Sending RS");
-      let size, fillf = Allocate.rs ~mac:ctx.mac (link_local_addr ctx.mac) in
+      let size, fillf = Allocate.rs ~mac:ctx.mac (fun ~dst:_ -> link_local_addr ctx.mac) in
       let dst = Ipaddr.link_routers in
       send' ~now ctx dst size fillf
     | SendQueued (ip, dmac) ->
