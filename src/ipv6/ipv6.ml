@@ -44,7 +44,9 @@ module Make (N : Mirage_net.S)
   let output t (dst, size, fill) =
     E.write t.ethif dst `IPv6 ~size fill
 
-  let output_ign t a = output t a >|= fun _ -> ()
+  let output_ign t a = output t a >|=
+    Result.fold ~ok:Fun.id
+      ~error:(fun e -> Logs.debug (fun f -> f "output_ign: %a" E.pp_error e))
 
   let start_ticking t u =
     let rec loop u =
@@ -156,12 +158,12 @@ module Make (N : Mirage_net.S)
           ~ipv6:(input t ~tcp:noop ~udp:noop ~default:(fun ~proto:_ -> noop))
       in
       let timeout = T.sleep_ns (Duration.of_sec 3) in
+      Lwt.async (fun () ->
+          N.listen netif ~header_size:Ethernet.Packet.sizeof_ethernet ethif_listener >|= fun _ -> ());
       Lwt.pick [
         (* MCP: replace this error swallowing with proper propagation *)
-        (Lwt_list.iter_s (output_ign t) outs >>= fun () ->
-         task) ;
-        (N.listen netif ~header_size:Ethernet.Packet.sizeof_ethernet ethif_listener >|= fun _ -> ()) ;
-        timeout
+        (Lwt_list.iter_s (output_ign t) outs >>= fun () -> task) ;
+        timeout ;
       ] >>= fun () ->
       let expected_ips = match cidr with None -> 1 | Some _ -> 2 in
       match get_ip t with
