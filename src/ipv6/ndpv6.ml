@@ -301,13 +301,16 @@ module AddressList = struct
     in
     loop al
 
-  let select_source al ~dst:_ =
+  let select_source al mac ~dst =
     let rec loop = function
       | (_, TENTATIVE _) :: rest -> loop rest
       | (ip, _) :: _             -> ip (* FIXME *)
       | []                       -> Ipaddr.unspecified
     in
-    loop al
+    if Ipaddr.Prefix.(mem dst link) then
+      link_local_addr mac
+    else
+      loop al
 
   let tick_one ~now ~retrans_timer = function
     | (ip, TENTATIVE (timeout, n, t)) when t <= now ->
@@ -1074,7 +1077,7 @@ let rec process_actions ~now ctx actions =
     | SendNS (unspec, dst, tgt) ->
       let src, specified = match unspec with
         | `Unspecified -> Ipaddr.unspecified, false
-        | `Specified -> AddressList.select_source ctx.address_list ~dst, true
+        | `Specified -> AddressList.select_source ctx.address_list ctx.mac ~dst, true
       in
       Log.debug (fun f -> f "ND6: Sending NS src=%a dst=%a tgt=%a"
         Ipaddr.pp src Ipaddr.pp dst Ipaddr.pp tgt);
@@ -1128,7 +1131,7 @@ and send' ~now ctx dst size fillf =
       process_actions ~now ctx actions
 
 let send ~now ctx ?src dst proto size fillf =
-  let src = match src with None -> AddressList.select_source ctx.address_list ~dst | Some s -> s in
+  let src = match src with None -> AddressList.select_source ctx.address_list ctx.mac ~dst | Some s -> s in
   let siz, fill = Allocate.hdr ~hlim:ctx.cur_hop_limit ~src ~dst ~proto ~size fillf in
   send' ~now ctx dst siz fill
 
@@ -1165,7 +1168,7 @@ let get_ip ctx =
   AddressList.to_list ctx.address_list
 
 let select_source ctx dst =
-  AddressList.select_source ctx.address_list ~dst
+  AddressList.select_source ctx.address_list ctx.mac ~dst
 
 let handle_ra ~now ~random ctx ~src ~dst ra =
   Log.debug (fun f -> f "ND: Received RA: src=%a dst=%a" Ipaddr.pp src Ipaddr.pp dst);
@@ -1293,7 +1296,7 @@ let handle ~now ~random ctx buf =
     let dst = src
     and src =
       if Ipaddr.is_multicast dst then
-        AddressList.select_source ctx.address_list ~dst
+        AddressList.select_source ctx.address_list ctx.mac ~dst
       else
         dst
     in

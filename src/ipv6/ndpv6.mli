@@ -45,8 +45,8 @@ val get_ip : context -> ipaddr list
 (** [get_ip ctx] returns the list of local ips. *)
 
 val select_source : context -> ipaddr -> ipaddr
-(** [select_source ctx ip] returns the ip that should be put in the source field
-    of a packet destined to [ip]. *)
+(** [select_source ctx ip] returns the ip that should be put in the source
+    field of a packet destined to [ip]. *)
 
 val handle : now:time -> random:(int -> Cstruct.t) -> context -> buffer ->
   context * (Macaddr.t * int * (buffer -> int)) list * event list
