@@ -325,7 +325,10 @@ module AddressList = struct
       else
         let dst = Ipaddr.Prefix.network_address solicited_node_prefix ip in
         Some (ip, TENTATIVE (timeout, n+1, Int64.add now retrans_timer)),
-        [SendNS (`Unspecified, dst, ip)]
+        if Ipaddr.Prefix.(mem ip link) then
+          [SendNS (`Specified, dst, ip)]
+        else
+          [SendNS (`Unspecified, dst, ip)]
     | ip, PREFERRED (Some (preferred_timeout, valid_lifetime)) when preferred_timeout <= now ->
       Log.debug (fun f -> f "SLAAC: %a --> DEPRECATED" Ipaddr.pp ip);
       let valid_timeout = match valid_lifetime with
