@@ -1079,8 +1079,8 @@ let rec process_actions ~now ctx actions =
   let aux ctx = function
     | SendNS (unspec, dst, tgt) ->
       Log.debug (fun f -> f "%s"
-                    match unspec with `Unspecified -> "Unspecified"
-                                    | `Specified -> "Specified");
+                    (match unspec with `Unspecified -> "Unspecified"
+                                     | `Specified -> "Specified"));
       let src, specified = match unspec with
         | `Unspecified -> Ipaddr.unspecified, false
         | `Specified -> AddressList.select_source ctx.address_list ctx.mac ~dst, true
