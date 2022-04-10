@@ -1084,7 +1084,7 @@ let rec process_actions ~now ctx actions =
       let src, specified = match unspec with
         | `Unspecified -> Ipaddr.unspecified, false
         | `Specified -> 
-          if Ipaddr.Prefix.(mem dst link) then
+          if Ipaddr.Prefix.(mem tgt link) then
             link_local_addr ctx.mac, true
           else
             AddressList.select_source ctx.address_list ctx.mac ~dst, true
