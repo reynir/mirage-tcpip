@@ -1248,7 +1248,7 @@ let handle_ns ~now:_ ctx ~src ~dst ns =
       ctx, []
   in
   if AddressList.is_my_addr ctx.address_list ns.ns_target then begin
-    let src = ns.ns_target
+    let src = link_local_addr ctx.mac
     and dst, sol =
       if Ipaddr.(compare src unspecified = 0) then
         Ipaddr.link_nodes, `Unsolicited
