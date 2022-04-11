@@ -1085,10 +1085,7 @@ let rec process_actions ~now ctx actions =
       let src, specified = match unspec with
         | `Unspecified -> Ipaddr.unspecified, false
         | `Specified -> 
-          if Ipaddr.Prefix.(mem tgt link) then
-            link_local_addr ctx.mac, true
-          else
-            AddressList.select_source ctx.address_list ctx.mac ~dst, true
+          link_local_addr ctx.mac, true
       in
       Log.debug (fun f -> f "ND6: Sending NS src=%a dst=%a tgt=%a"
         Ipaddr.pp src Ipaddr.pp dst Ipaddr.pp tgt);
