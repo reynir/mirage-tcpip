@@ -321,6 +321,7 @@ module AddressList = struct
             Some (Int64.add now preferred_lifetime, valid_lifetime)
         in
         Log.debug (fun f -> f "SLAAC: %a --> PREFERRED" Ipaddr.pp ip);
+        let dst = Ipaddr.Prefix.network_address solicited_node_prefix ip in
         Some (ip, PREFERRED timeout), [SendNS (`Specified, dst, ip)]
       else
         let dst = Ipaddr.Prefix.network_address solicited_node_prefix ip in
