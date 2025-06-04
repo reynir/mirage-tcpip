@@ -3,6 +3,9 @@ val sizeof_ipv4 : int
 val get_hlen_version : Cstruct.t -> int
 val set_hlen_version : Cstruct.t -> int -> unit
 
+val get_tos : Cstruct.t -> int
+val set_tos : Cstruct.t -> int -> unit
+
 val get_len : Cstruct.t -> int
 val set_len : Cstruct.t -> int -> unit
 
