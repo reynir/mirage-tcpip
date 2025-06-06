@@ -1,7 +1,7 @@
 let sizeof_ipv4 = 20
 
 let hlen_version_off = 0
-let _tos_off = 1
+let tos_off = 1
 let len_off = 2
 let id_off = 4
 let off_off = 6
@@ -13,6 +13,9 @@ let dst_off = 16
 
 let get_hlen_version buf = Cstruct.get_uint8 buf hlen_version_off
 let set_hlen_version buf v = Cstruct.set_uint8 buf hlen_version_off v
+
+let get_tos buf = Cstruct.get_uint8 buf tos_off
+let set_tos buf v = Cstruct.set_uint8 buf tos_off v
 
 let get_len buf = Cstruct.BE.get_uint16 buf len_off
 let set_len buf v = Cstruct.BE.set_uint16 buf len_off v
