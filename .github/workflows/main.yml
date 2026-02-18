@@ -18,7 +18,8 @@ jobs:
           - macos-latest
           - ubuntu-latest
         ocaml-compiler:
-          - 5
+          # NOTE: use just "5" when bisect_ppx becomes compatible with ocaml >= 5.4
+          - 5.3
           - 4
 
     runs-on: ${{ matrix.os }}
